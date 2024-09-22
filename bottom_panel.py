@@ -166,7 +166,12 @@ class Bpanel:
             logx(f"get_path_from_line: {line}")
             return line
         def search_filepath(ed, result_y):
-            """look upward for pathline line by line"""
+            """look upward for pathline via line by line
+            
+            :param str result_y: input anyone line from result window
+            :returns: return filepath's line that belong to input's line
+            :rtype: str
+            """
             for i in reversed(range(result_y)):
                 line = ed.get_text_line(i)
                 logx(f"i, line: {i}, {line}")
@@ -175,7 +180,7 @@ class Bpanel:
                     line = re.sub('>: #[0-9]+', '', line) #strip ">: #154..." suffix
                     logx(f"line: {line}")
                     return line
-                    #return  "tab:12xx:path" or "path"
+                    #return  "tab:12xx:path" or "tab:5:untitled2" or "path"
                     #when will only return "path"???
             
         carets = self.bottom_ed.get_carets() #[(PosX, PosY, EndX, EndY),...]
@@ -205,12 +210,9 @@ class Bpanel:
             #for unsaved tab (temp tab)
             tab_id  = int(filepathinfo.split('/')[0].split(':')[1])
             logx(f"tab_id: {tab_id}")
-            ed  = apx.get_tab_by_id(tab_id)
-            logx(ed)
-            ed.focus()  if ed else 0
             
-            #for closed tab
-            if ed == None:
+            ed  = apx.get_tab_by_id(tab_id) #can get None if tab is closed         
+            if ed == None: #for closed tab
                 logx(f"closed tab")
                 path = re.sub(r'^.*?/', '', filepathinfo)
                 if os.path.isfile(path):
@@ -222,7 +224,8 @@ class Bpanel:
                     logx(app.ed) #why none?
                     logx(app.ed.get_filename())
                     ed = app.ed
-
+            else: #for opened tab
+                ed.focus()
         elif os.path.isfile(filepathinfo):
             logx(f"filepathinfo without starting tab --- something wrong.")
             app.file_open(filepathinfo)
