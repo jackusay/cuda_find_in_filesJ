@@ -13,7 +13,7 @@ from cudatext import Editor
   #in app/py/cudatext.py 
   
 def logx(x):
-    #print(x)
+    print(x)
     pass
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'x_icon.png')
@@ -176,6 +176,7 @@ class Bpanel:
                     logx(f"line: {line}")
                     return line
                     #return  "tab:12xx:path" or "path"
+                    #when will only return "path"???
             
         carets = self.bottom_ed.get_carets() #[(PosX, PosY, EndX, EndY),...]
         result_y = carets[0][1] #result_y is on search result's window
@@ -199,12 +200,31 @@ class Bpanel:
         ########### change tab ###########
         filepathinfo = search_filepath(self.bottom_ed, result_y) #get line's filepath
         logx(f"filepathinfo: {filepathinfo}")
-        if filepathinfo.startswith('tab:'):
+        
+        if filepathinfo.startswith('tab:'): #when will get filepathinfo without starting "tab:"???
+            #for unsaved tab (temp tab)
             tab_id  = int(filepathinfo.split('/')[0].split(':')[1])
             logx(f"tab_id: {tab_id}")
             ed  = apx.get_tab_by_id(tab_id)
+            logx(ed)
             ed.focus()  if ed else 0
+            
+            #for closed tab
+            if ed == None:
+                logx(f"closed tab")
+                path = re.sub(r'^.*?/', '', filepathinfo)
+                if os.path.isfile(path):
+                    logx(f"path")
+                    app.file_open(path)
+                    app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below
+                    #app.Editor.focus()
+                    logx(ed) #why none?
+                    logx(app.ed) #why none?
+                    logx(app.ed.get_filename())
+                    ed = app.ed
+
         elif os.path.isfile(filepathinfo):
+            logx(f"filepathinfo without starting tab --- something wrong.")
             app.file_open(filepathinfo)
             app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below
         ###################################
@@ -226,6 +246,7 @@ class Bpanel:
         logx(prefix)
         main_x = mark[1] - prefix
         len_x = mark[3]
+        logx(ed)
         ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword
         logx(f"main_x: {main_x}, main_y: {main_y}, main_x_end: {main_x+len_x}, main_y: {main_y}")
         #####################################
