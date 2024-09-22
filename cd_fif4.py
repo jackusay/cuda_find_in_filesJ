@@ -1605,7 +1605,7 @@ class Fif4D:
             logx(f"in_what: {m.opts.in_what}") #Find keyword
             m.opts.wk_fold = "<tabs>"
             logx(f"wk_fold: {m.opts.wk_fold}") #From
-            m.opts.wk_incl = ed.get_prop(app.PROP_TAB_TITLE)
+            m.opts.wk_incl = quote_if_space(ed.get_prop(app.PROP_TAB_TITLE).strip('*'))
             logx(f"wk_incl: {m.opts.wk_incl}") #Files
             m.opts.wk_excl = ""
             logx(f"wk_excl: {m.opts.wk_excl}") #Skip
