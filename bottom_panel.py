@@ -198,7 +198,8 @@ class Bpanel:
             return
         if line_type == "openedpath":
             return
-        if line_type == "closedpath":
+        if line_type == "closedpath": #what is this???
+            printf(f"closedpath - something wrong")
             return
         
         #if line_type == "text":
@@ -211,8 +212,8 @@ class Bpanel:
             tab_id  = int(filepathinfo.split('/')[0].split(':')[1])
             logx(f"tab_id: {tab_id}")
             
-            ed  = apx.get_tab_by_id(tab_id) #can get None if tab is closed         
-            if ed == None: #for closed tab
+            tab_ed  = apx.get_tab_by_id(tab_id) #can get None if tab is closed         
+            if tab_ed == None: #for closed tab
                 logx(f"closed tab")
                 path = re.sub(r'^.*?/', '', filepathinfo)
                 if os.path.isfile(path):
@@ -220,12 +221,15 @@ class Bpanel:
                     app.file_open(path)
                     app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below
                     #app.Editor.focus()
-                    logx(ed) #why none?
-                    logx(app.ed) #why none?
+                    logx(tab_ed) #why none?
+                    logx(app.ed)
                     logx(app.ed.get_filename())
-                    ed = app.ed
+                    tab_ed = app.ed
+                else:
+                    printf("{path} doesn't exist.")
+                    return
             else: #for opened tab
-                ed.focus()
+                tab_ed.focus()
         elif os.path.isfile(filepathinfo):
             logx(f"filepathinfo without starting tab --- something wrong.")
             app.file_open(filepathinfo)
@@ -249,8 +253,8 @@ class Bpanel:
         logx(prefix)
         main_x = mark[1] - prefix
         len_x = mark[3]
-        logx(ed)
-        ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword
+        logx(tab_ed)
+        tab_ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword
         logx(f"main_x: {main_x}, main_y: {main_y}, main_x_end: {main_x+len_x}, main_y: {main_y}")
         #####################################
         
