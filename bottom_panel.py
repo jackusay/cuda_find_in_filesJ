@@ -13,7 +13,7 @@ from cudatext import Editor
   #in app/py/cudatext.py 
   
 def logx(x):
-    print(x)
+    #print(x)
     pass
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'x_icon.png')
