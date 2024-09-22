@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.1.01 2019-07-01'
+    '1.1.03 2024-06-10'
 Content
     See github.com/kvichans/cuda_kv_dlg/wiki
 ToDo: (see end of file)
@@ -648,11 +648,14 @@ class DlgAg:
             fpr['w_min']    = fpr.get('w_min', w0)
             fpr['h_min']    = fpr.get('h_min', h0)
             fpr.pop('resize', None)
-        
+
+        '''
         # Restore prev pos/sizes
+        # Commented 2024/09 becase dlg grows on each call
         fpr     = _form_acts('move', fprs=fpr                   # Move and (maybe) resize
                             , key4store=self.opts.get('form data key')) \
                     if self.opts.get('restore_position', True) else fpr
+        '''
         pass;                  #log("fpr['on_resize']={}",(fpr['on_resize']))
         pass;                  #log("fpr={}",(fpr))
         if      'on_resize' in fpr and (fpr['w'],fpr['h']) != (w0,h0):
@@ -1702,7 +1705,8 @@ def get_gui_autosize_width(ctrl_def):
         idd=app.dlg_proc(   0,   app.DLG_CREATE)
         idc=app.dlg_proc(   idd, app.DLG_CTL_ADD, tp)
         app.dlg_proc(       idd, app.DLG_CTL_PROP_SET, index=idc, prop=prc)
-        app.dlg_proc(       idd, app.DLG_PROP_SET, prop={'x':-1000, 'y':-1000, 'w':100, 'h':100})
+        app.dlg_proc(       idd, app.DLG_PROP_SET, prop={'x':-50, 'y':-50, 'w':0, 'h':0})
+#       app.dlg_proc(       idd, app.DLG_PROP_SET, prop={'x':-1000, 'y':-1000, 'w':100, 'h':100})
         app.dlg_proc(       idd, app.DLG_SHOW_NONMODAL)
         prc = app.dlg_proc( idd, app.DLG_CTL_PROP_GET, index=idc)
         app.dlg_proc(       idd, app.DLG_FREE)
@@ -1754,7 +1758,8 @@ def _get_gui_height(ctrl_type):
             if tpc in ('combo' 'combo_ro'):
                 prc['items']='item0'
             app.dlg_proc(       idd,    app.DLG_CTL_PROP_SET, index=idc, prop=prc)
-        app.dlg_proc(           idd,    app.DLG_PROP_SET, prop={'x':-1000, 'y':-1000, 'w':100, 'h':100})
+        app.dlg_proc(           idd,    app.DLG_PROP_SET, prop={'x':-50, 'y':-50, 'w':0, 'h':0})
+#       app.dlg_proc(           idd,    app.DLG_PROP_SET, prop={'x':-1000, 'y':-1000, 'w':100, 'h':100})
         app.dlg_proc(           idd,    app.DLG_SHOW_NONMODAL)
 
         ppi     = app.app_proc(app.PROC_GET_SYSTEM_PPI, '')

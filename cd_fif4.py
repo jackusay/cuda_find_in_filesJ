@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
 Version:
-    '4.8.12 2022-06-21'
+    '4.8.23 2024-09-22'
 '''
 
 # 2023-04-09
@@ -86,9 +86,22 @@ defdict     = lambda: defaultdict(int)
 mtime       = lambda f: dt.datetime.fromtimestamp(os.path.getmtime(f)) if os.path.exists(f) else 0
 msg_box     = lambda txt, flags=app.MB_OK: app.msg_box(txt, flags)
 ptime       = time.monotonic#time.process_time
+USERHOME    = os.path.expanduser('~')
 
 # Std tools
 def first_true(iterable, default=False, pred=None):return next(filter(pred, iterable), default) # 10.1.2. Itertools Recipes
+
+def quote_if_space(s):
+    if ' ' in s:
+        return '"' + s + '"'
+    else:
+        return s
+
+def collapse_filename(fn):
+    if os.name != 'nt':
+        if (fn+'/').startswith(USERHOME+'/'):
+            fn = fn.replace(USERHOME, '~', 1)
+    return fn
 
 _set_text_all_text  = ''
 def set_text_all(to_ed, text):
@@ -424,7 +437,9 @@ def show_fif4(run_opts=None):
 #   pass;                       return 
 
     global the_fif4
-    the_fif4    = the_fif4 if the_fif4 else Fif4D(run_opts)
+    if the_fif4:
+        del the_fif4
+    the_fif4 = Fif4D(run_opts)
     the_fif4.show(run_opts)
    #def show_fif4
 
@@ -509,8 +524,6 @@ class Fif4D:
            #def timing_to_stbr
        #class Dcrs
 
-    USERHOME        = os.path.expanduser('~')
-    
     AGEF_CP = _('A&ge of files')
     AGEF_L1 = [  'h',          'd',         'w',          'm',           'y'        ]
     AGEF_U1 = [_('h'),       _('d'),      _('w'),       _('m'),        _('y')       ]
@@ -1328,15 +1341,15 @@ class Fif4D:
         
         def set_dir(path):                      # Tool to set current folder/file/tab[s]
             if not path:    return d(fid=self.cid_what())
-            m.opts.wk_fold = path.replace(M.USERHOME, '~')
-            m.opts.wk_fold = '"'+m.opts.wk_fold+'"' if ' ' in m.opts.wk_fold else m.opts.wk_fold;
+            m.opts.wk_fold = collapse_filename(path)
+            m.opts.wk_fold = quote_if_space(m.opts.wk_fold)
             return d(fid=self.cid_what()
                     ,vals=d(wk_fold=m.opts.wk_fold))
         def set_fn(fn, fold=None):              # Tool to set current folder/file/tab[s]
             if not fn:      return d(fid=self.cid_what())
             m.opts.wk_incl = os.path.basename(fn)
-            m.opts.wk_fold = fold if fold else os.path.dirname(fn).replace(M.USERHOME, '~')
-            m.opts.wk_fold = '"'+m.opts.wk_fold+'"' if ' ' in m.opts.wk_fold else m.opts.wk_fold;
+            m.opts.wk_fold = fold if fold else collapse_filename(os.path.dirname(fn))
+            m.opts.wk_fold = quote_if_space(m.opts.wk_fold)
             m.opts.wk_excl = ''
             m.opts.wk_dept = 1
             return d(fid=self.cid_what()
@@ -1529,7 +1542,7 @@ class Fif4D:
                 elif do_emul and (scam,key)==( 's',VK_F4):  ag_.hide('emul')
                 elif (scam,key)==( 'c',VK_DOWN):                # Ctrl+Dn
                     upd     = d(vals=d(repl=ag_.val('in_what')))
-                elif (scam,key)==( 'c',ord('A')):               # Ctrl+A
+                elif (scam,key)==( 'c',ord('M')):               # Ctrl+M
                     vr_sgn  = m.var_acts('ask', _('With'))
                     if not vr_sgn:                  return []
                     cval    = ag_.val('repl')+vr_sgn
@@ -1850,7 +1863,7 @@ class Fif4D:
                                             ) for n,ps in enumerate(m.opts.ps_pset)]
         nm_macro= [(
     ),d(tag='a:vr-add'          ,cap=_('&Append macro var')+f'{" ("+fidc+")" if fidc else ""}'+DDD 
-       ,key='Ctrl+A'                                        ,en=bool(fidc) 
+       ,key='Ctrl+M'                                        ,en=bool(fidc) 
     ),d(tag='a:vr-new'          ,cap=_('Define n&ew custom var')+DDD
     ),d(                         cap=_('Chan&ge/remove custom var') ,en=bool(m.opts.vs_defs)    ,sub=[
       d(tag='a:vr-edt_'+str(n)  ,cap=var['nm']+' '+var['bd'][:25]+DDD)
@@ -2016,7 +2029,7 @@ class Fif4D:
         m.last_fid  = m.opts.us_focus
         m.ag = DlgAg(
             form    =dict(cap=DLG_CAP_BS+f' ({VERSION_V})'
-                         ,h=form_h,w=form_w             ,h_min0=form_h0,w_min0=form_w
+                         ,h=600, w=850                  ,h_min0=form_h0,w_min0=form_w
                                                         ,h_min=form_h0,w_min=form_w
 #                        ,frame='resize-min-max'
 #                        ,frame='resize'
@@ -2048,6 +2061,7 @@ class Fif4D:
             for pr in true_prs:
                 ded.set_prop(pr, true_prs[pr])
             ded.set_prop(app.PROP_LEXER_FILE, lex) if lex else 0
+            ded.set_prop(app.PROP_LINKS_SHOW, False)
             return ded
         
         m.rslt = fit_editor(m.ag, 'di_rslt', FIF_LEXER
@@ -2057,6 +2071,7 @@ class Fif4D:
                         ,app.PROP_MARGIN            :2000
                         ,app.PROP_TAB_SIZE          :1
                         ,app.PROP_MODERN_SCROLLBAR  :True
+                        ,app.PROP_WRAP              :False
                         })
         m.rslt.igno_sel = False
         
@@ -2127,7 +2142,7 @@ class Fif4D:
             m.ag.update(vals=m.vals_opts('o2v'))
 
         if m.ropts.get('work')=='in_tab' and m.opts.in_what:
-            m.opts.wk_incl  = ed.get_prop(app.PROP_TAB_TITLE).strip('*')
+            m.opts.wk_incl  = quote_if_space(ed.get_prop(app.PROP_TAB_TITLE).strip('*'))
             m.opts.wk_excl  = ''
             m.opts.wk_fold  = Walker.ROOT_IS_TABS
             m.ag.update(vals=m.vals_opts('o2v'))
@@ -2225,7 +2240,7 @@ class Fif4D:
         elif skey==('sca',VK_LEFT):                     upd=m.do_acts(ag, 'ps_prvr')            # Shift+Ctrl+Alt+LF
         elif skey==('sca',VK_RIGHT):                    upd=m.do_acts(ag, 'ps_nxtr')            # Shift+Ctrl+Alt+RT
         elif ('c',ord('1'))<=skey<=('c',ord('9')):      upd=m.do_acts(ag, 'ps_load_'+ckey1)     # Ctrl+1..9
-        elif skey==( 'c',ord('A')) and in_edct:         upd=m.do_acts(ag, 'vr-add')             # Ctrl+      A
+        elif skey==( 'c',ord('M')) and in_edct:         upd=m.do_acts(ag, 'vr-add')             # Ctrl+      M
         elif skey==('sc',ord('A')):                     upd=m.do_acts(ag, 'vr-sub')             # Ctrl+Shift+A
 #       elif skey==('a', 190):  
 #           pass;               log("m.opts.in_reex={}",(m.opts.in_reex))
@@ -2448,24 +2463,24 @@ class Fif4D:
         
         if act=='on_rslt_fld':                  # Show Source and select fragment
             doall   = par
-            fldi_l  = m.rslt.folding(app.FOLDING_GET_LIST)
+            fldi_l  = m.rslt.folding(app.FOLDING_ENUM)
             if not fldi_l:                      return []
             row     = m.rslt.get_carets()[0][1]
-            r_fldi_l= [(fldi_i,fldi_d,row-fldi_d[0]) for fldi_i,fldi_d in enumerate(fldi_l) 
-                        if fldi_d[0] <= row <= fldi_d[1] and
-                           fldi_d[0] !=        fldi_d[1]]         # [0]/[1] line of range start/end
+            r_fldi_l= [(fldi_i,fldi_d,row-fldi_d['y']) for fldi_i,fldi_d in enumerate(fldi_l) 
+                        if fldi_d['y'] <= row <= fldi_d['y2'] and
+                           fldi_d['y'] !=        fldi_d['y2']]         # [0]/[1] line of range start/end
             if not r_fldi_l:  return 
             r_fldi_l.sort(key=lambda ifd:ifd[2])
             fldi_i, \
             fldi_d  = r_fldi_l[0][:2]
-            fldied  = fldi_d[4]
+            fldied  = fldi_d['folded']
             if doall:
                 m.rslt.folding(app.FOLDING_UNFOLD_ALL   if fldied else app.FOLDING_FOLD_ALL)
                 m.rslt.folding(app.FOLDING_UNFOLD, index=0) if not fldied else 0
             else:
                 m.rslt.folding(app.FOLDING_UNFOLD       if fldied else app.FOLDING_FOLD, index=fldi_i)
             if not fldied:
-                m.rslt.set_caret(0, fldi_d[0])
+                m.rslt.set_caret(0, fldi_d['y'])
 
         if act=='on_rslt_crt':                  # Show Source and select fragment
             m.stbr_act('')                      # Clear status
@@ -2563,6 +2578,7 @@ class Fif4D:
             if not m.srcf.fif_path: return []
             pass;              #log("m.srcf.fif_path={}",(m.srcf.fif_path))
             logx("only seconed jump will run to here")
+            m.rslt_srcf_acts('on_rslt_crt') # trigger on_caret event of 'results' view, 'source' view will be updated
             tab_ed  = None
             path    = m.srcf.fif_path
             if path.startswith('tab:'):
@@ -3591,7 +3607,7 @@ class Reporter:
                     if not node_dr:
                         node_fr = dcta(tp='fr', frs=[newFR(fr.f, fnm, fr)])
 #                       node_fr = dcta(tp='fr', frs=[newFR(fr.f, fr)])
-                        node_dr = dcta(tp='ff', subs=[node_fr], p=fr.p, f=dp, cnt=len(fr.cws) - (1 if fr.e else 0))
+                        node_dr = dcta(tp='ff', subs=[node_fr], p=dp, f=dp, cnt=len(fr.cws) - (1 if fr.e else 0))
 #                       node_dr = dcta(tp='ff', subs=[node_fr], p=dp        , cnt=len(fr.cws) - (1 if fr.e else 0))
                         dirs[dp]    = node_dr
                         root       += [node_dr]
@@ -3647,7 +3663,7 @@ class Reporter:
                     node_dr     = dirs.get(dp)
                     if not node_dr:
                         node_fr = dcta(tp='fr', frs=[newFR(fr.f, fnm, fr)])
-                        node_dr = dcta(tp='ff', subs=[node_fr], p=fr.p, f=dp, cnt=len(fr.cws) - (1 if fr.e else 0))
+                        node_dr = dcta(tp='ff', subs=[node_fr], p=dp, f=dp, cnt=len(fr.cws) - (1 if fr.e else 0))
 #                       node_dr = dcta(tp='ff', subs=[node_fr], p=dp        , cnt=len(fr.cws) - (1 if fr.e else 0))
                         dirs[dp]    = node_dr
                         root       += [node_dr]
@@ -4031,7 +4047,7 @@ class Walker:
         """
         mask    = mask.strip()
         if '"' in mask:
-            # Temporary replace all ' ' into "" to '·'
+            # Temporary replace all spaces in "" to '·'
             re_binqu= re.compile(r'"([^"]+) ([^"]+)"')
             while re_binqu.search(mask):
                 mask= re_binqu.sub(r'"\1·\2"', mask) 
@@ -4058,7 +4074,7 @@ class Walker:
             return [mask]
         flds    = mask.split(' ')
         if '"' in mask:
-            # Temporary replace all ' ' into "" to '·'
+            # Temporary replace all spaces in "" to '·'
             re_binqu= re.compile(r'"([^"]+) ([^"]+)"')
             while re_binqu.search(mask):
                 mask= re_binqu.sub(r'"\1·\2"', mask) 
@@ -4746,8 +4762,7 @@ def _get_proj_dirs():
                 if is_ext: break
             if not is_ext: 
                 pdirs.append(p)
-        pdirs   = [f'"{p}"' if ' ' in p else p
-                    for p in pdirs]
+        pdirs   = [quote_if_space(p) for p in pdirs]
     except:
         pass;                  #log("ex",())
         pdirs = []
