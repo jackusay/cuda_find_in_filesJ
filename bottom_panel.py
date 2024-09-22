@@ -192,14 +192,14 @@ class Bpanel:
         line_type = check_text_line(line_text)
         logx(f"line_type: {line_type}")
         if not line_type:
-            print("no line type")
+            print("FiF4J: no line type")
             return
         if line_type == "keyword":
             return
         if line_type == "openedpath":
             return
         if line_type == "closedpath": #what is this???
-            printf(f"closedpath - something wrong")
+            printf(f"FiF4J: closedpath - something wrong")
             return
         
         #if line_type == "text":
@@ -226,7 +226,7 @@ class Bpanel:
                     logx(app.ed.get_filename())
                     tab_ed = app.ed
                 else:
-                    printf("{path} doesn't exist.")
+                    printf("FiF4J: {path} doesn't exist.")
                     return
             else: #for opened tab
                 tab_ed.focus()
@@ -242,7 +242,7 @@ class Bpanel:
         #logx(f"{marks}")
         mark = get_mark_on_line(result_y, marks)  # need to check empty
         if not mark:
-            print("no mark? why?")
+            print("FiF4J: no mark? why?")
             return
         mark = mark[0]
         logx(f"{mark}")
