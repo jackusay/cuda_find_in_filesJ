@@ -182,9 +182,24 @@ class Bpanel:
                     return line
                     #return  "tab:12xx:path" or "tab:5:untitled2" or "path"
                     #when will only return "path"???
+        def find_nearest_keyword(marks, click_position):
+            #marks == [(tag, x, y, len,...),(tag2, x2,...)...
             
+            nearest_keyword_index = None
+            min_distance = float('inf')
+            for index, mark in enumerate(marks):
+                start = mark[1]
+                end = mark[2]
+                
+                distance = min(abs(start - click_position), abs(end - click_position))
+                if distance < min_distance:
+                    min_distance = distance
+                    nearest_keyword_index = index
+            return nearest_keyword_index
+                    
         carets = self.bottom_ed.get_carets() #[(PosX, PosY, EndX, EndY),...]
         result_y = carets[0][1] #result_y is on search result's window
+        result_x = carets[0][0]
         logx(f"get_carets: {carets}")
         
         line_text = self.bottom_ed.get_text_line(result_y)
@@ -240,19 +255,20 @@ class Bpanel:
         marks = self.bottom_ed.attr(app.MARKERS_GET) #return full mark on whole result
             #ex: [(tag, x, y, len,...),(tag2, x2,...)...
         #logx(f"{marks}")
-        mark = get_mark_on_line(result_y, marks)  # need to check empty
-        if not mark:
+        marks_on_line_y = get_mark_on_line(result_y, marks)  # need to check empty
+        if not marks_on_line_y:
             print("FiF4J: no mark? why?")
             return
-        mark = mark[0]
-        logx(f"{mark}")
+        nearest_mark_index = find_nearest_keyword(marks_on_line_y, result_x)
+        marks_on_line_y = marks_on_line_y[nearest_mark_index]
+        logx(f"{marks_on_line_y}")
             
         main_y = get_main_y(line_text) #main editor's y
         logx( len(re.sub('.+>: ', '', line_text)) )
         prefix = len(line_text) - len(re.sub('.+>: ', '', line_text)) #"\t\t<xx...x>:"
         logx(prefix)
-        main_x = mark[1] - prefix
-        len_x = mark[3]
+        main_x = marks_on_line_y[1] - prefix
+        len_x = marks_on_line_y[3]
         logx(tab_ed)
         tab_ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword
         logx(f"main_x: {main_x}, main_y: {main_y}, main_x_end: {main_x+len_x}, main_y: {main_y}")
