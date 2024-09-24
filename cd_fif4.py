@@ -3828,9 +3828,24 @@ class Reporter:
         pass;                  #log("?? marks")
         #logx(f"ltkns: {ltkns}")
         #logx(f"marks: {marks}")
+        
+        #theme = app.app_proc(app.PROC_THEME_SYNTAX_DICT_GET, '')
+        bpanel_keyword_color_back = 12632240 #theme["LightBG5"]["color_back"]
+        bpanel_keyword_color_font = 0 #theme["LightBG5"]["color_font"]
+          #Highlight the matching words in the search results within bpanel.
+          #For the search keyword style in bpanel.
         if -1==-1 and app.app_api_version()>='1.0.310':# app 1.88.8 
-            ltkns = {} # otherwise too many mark?
-            if ltkns:
+            
+            ### for bpanel keyword style###
+            if marks:
+                rws, cls, lns   = list(zip(*marks))
+                #bpanel.bottom_ed.attr(app.MARKERS_ADD_MANY, x=cls, y=rws, len=lns, **MARK_FIND_STYLE)
+                    #original FiF keyword style, which is simple **underline** the keyword
+                bpanel.bottom_ed.attr(app.MARKERS_ADD_MANY, x=cls, y=rws, len=lns, color_font=bpanel_keyword_color_font, color_bg=bpanel_keyword_color_back)
+                    #highlighting the keyword
+            ###############################
+                
+            if ltkns: #ltkns has many marks, which can confuse bpanel
                 ltkns   = merge_markers(ltkns, marks, MARK_FIND_STYLE)
                     # `marks` merges with self.rfrgs.st style. maybe rfrgs.st is original text lexer style?
                 logx(f"marks: {marks}")
@@ -3852,20 +3867,19 @@ class Reporter:
                 else:                           # Report about searches
                     rws, cls, lns   = list(zip(*marks))
                     ed_.attr(app.MARKERS_ADD_MANY, x=cls, y=rws, len=lns, **MARK_FIND_STYLE)
-                    theme = app.app_proc(app.PROC_THEME_SYNTAX_DICT_GET, '')
-                    if theme and theme["LightBG5"]:
-                        if theme["LightBG5"]["color_back"]:
-                            color_back = theme["LightBG5"]["color_back"]
-                            color_ft = theme["LightBG5"]["color_font"]
-                    else:
-                        color_back = 0x00FF00
-                        #color_ft = 
-                    bpanel.bottom_ed.attr(app.MARKERS_ADD_MANY, x=cls, y=rws, len=lns, color_font=color_ft, color_bg=color_back)
             
             if lpths:
                 rws, cls, lns = list(zip(*lpths))
                 ed_.attr(app.MARKERS_ADD_MANY, x=cls, y=rws, len=lns, **LPTH_FIND_STYLE)
         else:
+            ### for bpanel keyword style###
+            if marks:
+                for rw, cl, ln in marks:
+                    #bpanel.bottom_ed.attr(app.MARKERS_ADD, x=cl, y=rw, len=ln, **MARK_FIND_STYLE)
+                        #original FiF keyword style
+                    bpanel.bottom_ed.attr(app.MARKERS_ADD, x=cl, y=rw, len=ln, color_font=bpanel_keyword_color_font, color_bg=bpanel_keyword_color_back)
+            ###############################
+            
             if ltkns:
                 ltkns   = merge_markers(ltkns, marks, MARK_FIND_STYLE)
                 for rw, cl, ln, st in ltkns:
