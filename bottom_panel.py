@@ -121,13 +121,15 @@ class Bpanel:
                 <  2>: module "cudatext_cmd"    
         """ 
         def get_mark_on_line(y, marks):
-            """In result window, original FiF store all mark info every line, we need to find out which one we need based on the line of user clicking.
+            """In result window, marks variable contain all line's marks.
+            Find the markers for a specific result line.
             
             Args:
-                y: result's y
+                y (int): Line number in the result window.
+                marks (list): List of markers from the result window.
                 
             Returns:
-                result: result's mark
+                list: A list of markers associated with the given line `y`.
             """
             #logx(f"y: {y}")
             #logx(f"marks: {marks}")
@@ -142,24 +144,25 @@ class Bpanel:
             """give it result's line, return main_y"""
             y = None
             y = line[3:] #strip "\t\t<" prefix
-            y = re.sub('>.+', '', y)
+            y = re.sub('>.+', '', y) #strip suffix
             y = y.strip() #removing all leading and trailing whitespaces.
             logx(f"y: {y}")
             return int(y) - 1
-        def check_text_line(line):
+        def check_line_type(line):
             """give it result's line, return type of line"""
             #return string: "keyword" or "path" or "text" or ""
-            result = ""
+
             if line.startswith("+Search"):
                 return "keyword"
-            if line.startswith("\t\t<"):
+            elif line.startswith("\t\t<"):
                 return "text"
-            if line.startswith("\t<tab:"):
+            elif line.startswith("\t<tab:"):
                 return "openedpath"
-            if line.startswith("\t<"):
+            elif line.startswith("\t<"): #useless???
                 return "closedpath"
-            return result
+            return None
         def get_path_from_line(line):
+            """Extract the filepath from a result line."""
             line = re.sub('\t<tab:[0-9]+\/', '', line) #strip "\t<tab:3125.../" prefix
             logx(f"get_path_from_line: {line}")
             line = re.sub('>: #[0-9]+', '', line) #strip ">: #154..." suffix
@@ -167,6 +170,8 @@ class Bpanel:
             return line
         def search_filepath(ed, result_y):
             """look upward for pathline via line by line
+            
+            Find the filepath line by searching upward from the current result line.
             
             :param str result_y: input anyone line from result window
             :returns: return filepath's line that belong to input's line
@@ -183,6 +188,7 @@ class Bpanel:
                     #return  "tab:12xx:path" or "tab:5:untitled2" or "path"
                     #when will only return "path"???
         def find_nearest_keyword(marks, click_position):
+            """Find the nearest marker to the user's click position."""
             #marks == [(tag, x, y, len,...),(tag2, x2,...)...
             
             nearest_keyword_index = None
@@ -204,7 +210,7 @@ class Bpanel:
         
         line_text = self.bottom_ed.get_text_line(result_y)
         logx(f"line_text: {line_text}")
-        line_type = check_text_line(line_text)
+        line_type = check_line_type(line_text)
         logx(f"line_type: {line_type}")
         if not line_type:
             print("FiF4J: no line type")
@@ -252,6 +258,7 @@ class Bpanel:
         ###################################
         
         ######### set caret ###############
+        # Set caret in the main editor
         marks = self.bottom_ed.attr(app.MARKERS_GET) #return full mark on whole result
             #ex: [(tag, x, y, len,...),(tag2, x2,...)...
         #logx(f"{marks}")
@@ -260,17 +267,17 @@ class Bpanel:
             print("FiF4J: no mark? why?")
             return
         nearest_mark_index = find_nearest_keyword(marks_on_line_y, result_x)
-        marks_on_line_y = marks_on_line_y[nearest_mark_index]
-        logx(f"{marks_on_line_y}")
+        mark_on_line_y = marks_on_line_y[nearest_mark_index]
+        logx(f"{mark_on_line_y}")
             
         main_y = get_main_y(line_text) #main editor's y
         logx( len(re.sub('.+>: ', '', line_text)) )
-        prefix = len(line_text) - len(re.sub('.+>: ', '', line_text)) #"\t\t<xx...x>:"
-        logx(prefix)
-        main_x = marks_on_line_y[1] - prefix
-        len_x = marks_on_line_y[3]
+        prefix_len = len(line_text) - len(re.sub('.+>: ', '', line_text)) #"\t\t<xx...x>:"
+        logx(prefix_len)
+        main_x = mark_on_line_y[1] - prefix_len
+        len_x = mark_on_line_y[3]
         logx(tab_ed)
-        tab_ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword
+        tab_ed.set_caret(main_x, main_y, main_x+len_x, main_y) #select keyword in main editor
         logx(f"main_x: {main_x}, main_y: {main_y}, main_x_end: {main_x+len_x}, main_y: {main_y}")
         #####################################
         
