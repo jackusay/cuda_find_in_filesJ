@@ -219,7 +219,7 @@ class Bpanel:
             return
         if line_type == "openedpath":
             return
-        if line_type == "closedpath": #what is this???
+        if line_type == "closedpath": #FiF can search closed files
             printf(f"FiF4J: closedpath - something wrong")
             return
         

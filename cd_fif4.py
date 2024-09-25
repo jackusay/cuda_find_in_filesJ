@@ -3834,6 +3834,8 @@ class Reporter:
         bpanel_keyword_color_font = 0 #theme["LightBG5"]["color_font"]
           #Highlight the matching words in the search results within bpanel.
           #For the search keyword style in bpanel.
+          #
+          #user change theme also change bottom panel theme except keyword part.
         if -1==-1 and app.app_api_version()>='1.0.310':# app 1.88.8 
             
             ### for bpanel keyword style###
