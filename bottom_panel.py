@@ -150,7 +150,7 @@ class Bpanel:
             return int(y) - 1
         def check_line_type(line):
             """give it result's line, return type of line"""
-            #return string: "keyword" or "path" or "text" or ""
+            #return string: "keyword" or "path" or "text" or None
 
             if line.startswith("+Search"):
                 return "keyword"
@@ -210,7 +210,7 @@ class Bpanel:
         
         line_text = self.bottom_ed.get_text_line(result_y)
         logx(f"line_text: {line_text}")
-        line_type = check_line_type(line_text)
+        line_type = check_line_type(line_text) #everything except text type is useless 
         logx(f"line_type: {line_type}")
         if not line_type:
             print("FiF4J: no line type")
@@ -228,7 +228,7 @@ class Bpanel:
         filepathinfo = search_filepath(self.bottom_ed, result_y) #get line's filepath
         logx(f"filepathinfo: {filepathinfo}")
         
-        if filepathinfo.startswith('tab:'): #when will get filepathinfo without starting "tab:"???
+        if filepathinfo.startswith('tab:'): #for opened / has been opened files
             #for unsaved tab (temp tab)
             tab_id  = int(filepathinfo.split('/')[0].split(':')[1])
             logx(f"tab_id: {tab_id}")
@@ -251,7 +251,7 @@ class Bpanel:
                     return
             else: #for opened tab
                 tab_ed.focus()
-        elif os.path.isfile(filepathinfo):
+        elif os.path.isfile(filepathinfo): #for closed file. can't be here, not implement yet.
             logx(f"filepathinfo without starting tab --- something wrong.")
             app.file_open(filepathinfo)
             app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below

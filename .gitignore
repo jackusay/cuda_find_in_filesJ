@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 
 bash.exe.stackdump
+.chglog
