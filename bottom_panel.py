@@ -158,8 +158,8 @@ class Bpanel:
                 return "text"
             elif line.startswith("\t<tab:"):
                 return "openedpath"
-            elif line.startswith("\t<"): #useless???
-                return "closedpath"
+            elif line.startswith("\t<"): #for never opened files. no implement 
+                return "never_openedpath"
             return None
         def get_path_from_line(line):
             """Extract the filepath from a result line."""
@@ -186,7 +186,7 @@ class Bpanel:
                     logx(f"line: {line}")
                     return line
                     #return  "tab:12xx:path" or "tab:5:untitled2" or "path"
-                    #when will only return "path"???
+                    #only return "path" #for never opened files. no implement
         def find_nearest_keyword(marks, click_position):
             """Find the nearest marker to the user's click position."""
             #marks == [(tag, x, y, len,...),(tag2, x2,...)...
@@ -219,8 +219,9 @@ class Bpanel:
             return
         if line_type == "openedpath":
             return
-        if line_type == "closedpath": #FiF can search closed files
-            printf(f"FiF4J: closedpath - something wrong")
+        if line_type == "never_openedpath": #original FiF can search closed files
+            #can't be here, not implement yet.
+            printf(f"FiF4J: never_openedpath - something wrong")
             return
         
         #if line_type == "text":
@@ -242,8 +243,6 @@ class Bpanel:
                     app.file_open(path)
                     app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below
                     #app.Editor.focus()
-                    logx(tab_ed) #why none?
-                    logx(app.ed)
                     logx(app.ed.get_filename())
                     tab_ed = app.ed
                 else:
@@ -251,7 +250,8 @@ class Bpanel:
                     return
             else: #for opened tab
                 tab_ed.focus()
-        elif os.path.isfile(filepathinfo): #for closed file. can't be here, not implement yet.
+        elif os.path.isfile(filepathinfo): 
+            #for never opened files. can't be here, not implement yet.
             logx(f"filepathinfo without starting tab --- something wrong.")
             app.file_open(filepathinfo)
             app.app_idle(True) # ax: helps to scroll to caret in tab_ed.set_caret below
@@ -264,7 +264,7 @@ class Bpanel:
         #logx(f"{marks}")
         marks_on_line_y = get_mark_on_line(result_y, marks)  # need to check empty
         if not marks_on_line_y:
-            print("FiF4J: no mark? why?")
+            print("FiF4J: no mark? something wrong.")
             return
         nearest_mark_index = find_nearest_keyword(marks_on_line_y, result_x)
         mark_on_line_y = marks_on_line_y[nearest_mark_index]
