@@ -3761,10 +3761,11 @@ class Reporter:
                     pass;      #log("kid=\n{}",pfw(kid))
                     tim     = ' ('+fit_ftim(kid.p)+')' if ftim and os.path.exists(kid.p) else ''
                     
-                    #filename in result
+                    #always display filename (full path) in result
+                    #Original FiF shows title if tabs are in same folder, shows filename if tabs are in diff folders. 
                     body   += [f('{gap}<{fil}{tim}>: #{cnt}'
                                 , gap=TAB*dpth
-                                , fil=kid.p #fifx for full path in diff folder
+                                , fil=kid.p #fifx always need full path
                                 , tim=tim
                                 , cnt=kid.cnt)]
                     node2body(kid.subs, body, locs, 1+dpth)
@@ -4163,9 +4164,9 @@ class TabsWalker:
             # Skip the tab?
             if not       any(map(lambda cl:fnmatch(title, cl), incls)):   continue#for
             if excls and any(map(lambda cl:fnmatch(title, cl), excls)):   continue#for
-            if filename:
+            if filename: #filename is full path
                 path    = f'tab:{tab_id}/{filename}'
-            else:
+            else: #for unsaved file
                 path    = f'tab:{tab_id}/{title}'
             
             # Use!
