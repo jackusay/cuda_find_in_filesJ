@@ -1,19 +1,24 @@
-# Find in files J
+# Find in Files J - CudaText Plugin
 
-Everything works like original FiF version, except:
+This plugin enhances the default "Find in Files" (FiF) functionality in CudaText by providing additional features inspired by Notepad++. 
 
-* insert result inside bottom panel like notepad++
+## Key Features
 
-* add two buttons:
+- **Result Display in Bottom Panel:**  
+  Search results are displayed in the bottom panel.
 
-_Find in Current Tab_ button: 
-It finds keywords in the active document.
-It ignores `files`, `skip`, `from`, `depth` input fields.
+- **Additional Search Options:**
+  - **Find in Current Tab** button:  
+    Allows you to search for keywords exclusively within the active document.  
+    *Note:* This option bypasses the `files`, `skip`, `from`, and `depth` input fields.
+  
+  - **Find in All Tabs** button:  
+    Allows you to search for keywords across all open documents.  
+    *Note:* This option also ignores the `files`, `skip`, `from`, and `depth` input fields.
 
-_Find in All Tabs_ button: 
-It finds keywords in all opened documents.
-It ignores `files`, `skip`, `from`, `depth` input fields.
+- **Quick Access via Bottom Bar:**  
+  A dedicated bottom bar is provided to open and manage the search results panel with ease.
 
-* add a bottom bar for opening the search result panel
+## Screenshot
 
 ![screenshot](githubimg/screenshot.jpg)
