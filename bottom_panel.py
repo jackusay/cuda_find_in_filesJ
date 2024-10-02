@@ -213,7 +213,7 @@ class Bpanel:
         line_type = check_line_type(line_text) #everything except text type is useless 
         logx(f"line_type: {line_type}")
         if not line_type:
-            print("FiF4J: no line type")
+            print("FiFJ: no line type")
             return
         if line_type == "keyword":
             return
@@ -221,7 +221,7 @@ class Bpanel:
             return
         if line_type == "never_openedpath": #original FiF can search closed files
             #can't be here, not implement yet.
-            printf(f"FiF4J: never_openedpath - something wrong")
+            printf(f"FiFJ: never_openedpath - something wrong")
             return
         
         #if line_type == "text":
@@ -246,7 +246,7 @@ class Bpanel:
                     logx(app.ed.get_filename())
                     tab_ed = app.ed
                 else:
-                    printf("FiF4J: {path} doesn't exist.")
+                    printf("FiFJ: {path} doesn't exist.")
                     return
             else: #for opened tab
                 tab_ed.focus()
@@ -264,7 +264,7 @@ class Bpanel:
         #logx(f"{marks}")
         marks_on_line_y = get_mark_on_line(result_y, marks)  # need to check empty
         if not marks_on_line_y:
-            print("FiF4J: no mark? something wrong.")
+            print("FiFJ: no mark? something wrong.")
             return
         nearest_mark_index = find_nearest_keyword(marks_on_line_y, result_x)
         mark_on_line_y = marks_on_line_y[nearest_mark_index]

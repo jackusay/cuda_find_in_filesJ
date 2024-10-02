@@ -3830,13 +3830,20 @@ class Reporter:
         #logx(f"ltkns: {ltkns}")
         #logx(f"marks: {marks}")
         
-        #theme = app.app_proc(app.PROC_THEME_SYNTAX_DICT_GET, '')
-        bpanel_keyword_color_back = 12632240 #theme["LightBG5"]["color_back"]
-        bpanel_keyword_color_font = 0 #theme["LightBG5"]["color_font"]
-          #Highlight the matching words in the search results within bpanel.
-          #For the search keyword style in bpanel.
-          #
-          #user change theme also change bottom panel theme except keyword part.
+        ### for bpanel keyword style###
+        try:
+            theme = app.app_proc(app.PROC_THEME_SYNTAX_DICT_GET, '')
+            bpanel_keyword_color_back = theme["LightBG5"]["color_back"]
+            bpanel_keyword_color_font = theme["LightBG5"]["color_font"]
+        except:
+            bpanel_keyword_color_back = 12632240 #theme["LightBG5"]["color_back"]
+            bpanel_keyword_color_font = 0 #theme["LightBG5"]["color_font"]
+                #Highlight the matching words in the search results within bpanel.
+                #For the search keyword style in bpanel.
+                #
+                #user change theme also change bottom panel theme except keyword part.
+        ###############################
+        
         if -1==-1 and app.app_api_version()>='1.0.310':# app 1.88.8 
             
             ### for bpanel keyword style###
