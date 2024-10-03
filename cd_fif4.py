@@ -3712,6 +3712,8 @@ class Reporter:
         pass;                   log__('trfm,shcw,relp,finl,ftim,root={}',(trfm,shcw,relp,finl,ftim,root)         ,__=(log4fun,Reporter.log4cls)) if _log4mod>=0 else 0
 
         # Prepare Results tree
+        if bpanel.click_fict_or_fiat:
+            trfm = TRFM_P_LL #bpanel need default format
         tree        = self.build_tree(trfm)
         pass;                   trfm = trfm if tree else                 TRFM_PLL
         pass;                   tree = tree if tree else self.build_tree(TRFM_PLL)
