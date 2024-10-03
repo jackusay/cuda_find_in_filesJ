@@ -1626,6 +1626,9 @@ class Fif4D:
             m.ag.hide() #hide find window #will this cause problem???
             m.ag.update()
             logx("di_fict - end")
+            
+            # after using bpanel, without this line, menu option becomes invalid until CudaText is restarted.
+            bpanel.click_fict_or_fiat = False
             return upd
             #return m.do_acts(ag, 'di_find') #do_acts() again will reset m.opts
         
@@ -1658,6 +1661,9 @@ class Fif4D:
             #quit() #raise error
             #m.ag.show() #useless
             logx("di_fiat -end")
+            
+            # after using bpanel, without this line, menu option becomes invalid until CudaText is restarted.
+            bpanel.click_fict_or_fiat = False
             return upd
             
         pass;                   msg_box('??do '+aid)
@@ -3555,6 +3561,7 @@ class Reporter:
         pass;                   log4fun=0
         pass;                   log__('trfm={}, self.rfrgs=\n{}',trfm, pfw(self.rfrgs,60)         ,__=(log4fun,Reporter.log4cls)) if _log4mod>=0 else 0
         logx(f"trfm: {trfm}") #P_LL
+        
         if trfm == TRFM_PLL:    # <path(r:c:w)>: line
             return [dcta(tp='fr', frs=[fr]) for fr in self.rfrgs]
         
