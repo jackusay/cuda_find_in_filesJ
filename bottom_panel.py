@@ -27,6 +27,8 @@ class Bpanel:
     h_console = None                #form handle
     
     bottom_ed = None
+    
+    click_fict_or_fiat = False #check if user click [find in current tab] or [find in all tabs] button
 
     def __init__(self):
 

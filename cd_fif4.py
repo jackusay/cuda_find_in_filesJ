@@ -1602,6 +1602,8 @@ class Fif4D:
             return []
 
         if aid=='di_fict':                      # Find All in Current Document
+            bpanel.click_fict_or_fiat = True
+            
             logx(f"in_what: {m.opts.in_what}") #Find keyword
             m.opts.wk_fold = "<tabs>"
             logx(f"wk_fold: {m.opts.wk_fold}") #From
@@ -1628,6 +1630,8 @@ class Fif4D:
             #return m.do_acts(ag, 'di_find') #do_acts() again will reset m.opts
         
         if aid=='di_fiat':                      # Find All in All Document
+            bpanel.click_fict_or_fiat = True
+            
             m.opts.wk_fold = "<tabs>"
             logx(f"wk_fold: {m.opts.wk_fold}") #From
             m.opts.wk_incl = "*"
@@ -3824,7 +3828,8 @@ class Reporter:
         #logx(f"body: {body}")
         logx(ed.get_filename())
         logx(f"bpanel.bottom_ed in fif: {bpanel.bottom_ed}")
-        bpanel.bottom_ed.insert( 0, 0, '\n'.join(body) + "\n" )
+        if bpanel.click_fict_or_fiat:
+            bpanel.bottom_ed.insert( 0, 0, '\n'.join(body) + "\n" )
         
         pass;                  #log("?? marks")
         #logx(f"ltkns: {ltkns}")
