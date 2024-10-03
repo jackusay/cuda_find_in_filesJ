@@ -3769,7 +3769,8 @@ class Reporter:
                     #Original FiF shows title if tabs are in same folder, shows filename if tabs are in diff folders. 
                     body   += [f('{gap}<{fil}{tim}>: #{cnt}'
                                 , gap=TAB*dpth
-                                , fil=kid.p #fifx always need full path
+                                , fil=kid.p if bpanel.click_fict_or_fiat else \
+                                (os.path.relpath(kid.p, root) if relp else kid.p) #bpanel need full path
                                 , tim=tim
                                 , cnt=kid.cnt)]
                     node2body(kid.subs, body, locs, 1+dpth)
@@ -4176,9 +4177,13 @@ class TabsWalker:
             # Skip the tab?
             if not       any(map(lambda cl:fnmatch(title, cl), incls)):   continue#for
             if excls and any(map(lambda cl:fnmatch(title, cl), excls)):   continue#for
-            if filename: #filename is full path
-                path    = f'tab:{tab_id}/{filename}'
-            else: #for unsaved file
+            
+            if bpanel.click_fict_or_fiat: #for bpanel only
+                if filename: #filename is full path
+                    path    = f'tab:{tab_id}/{filename}'
+                else: #for unsaved file
+                    path    = f'tab:{tab_id}/{title}'
+            else: #for original Find in Find
                 path    = f'tab:{tab_id}/{title}'
             
             # Use!
